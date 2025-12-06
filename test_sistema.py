@@ -3,67 +3,87 @@ import pytest
 from sistema import Cliente, CalculadoraPedidoService
 
 
-# Fixture: cria o serviço uma vez para usar em todos os testes
+# --- DRIVER ---
 @pytest.fixture
 def service():
     return CalculadoraPedidoService()
 
 
-# --- Teste do Caminho Feliz ---
+# --- CAMINHO FELIZ ---
 
 def test_caminho_feliz(service):
-    cliente = Cliente( 0, "sp")
-    assert  service.processar_pedido(cliente, 100)
+    # STUB: Instanciação de um objeto Cliente com estado fixo para teste
+    cliente = Cliente(0, "sp")
+
+    # Verificação: Perfil Básico (0% desc) + SP (0% frete) -> 100 permanece 100
+    assert service.processar_pedido(cliente, 100) == 100.0
 
 
-# --- Testes RN01 ---
+# --- TESTES RN01 ---
 
-# Perfil Básico
 def test_rn01_basico(service):
-    cliente = Cliente( 0, "sp")
-    assert  service.processar_pedido(cliente, 100)
+    # STUB: Cliente Básico
+    cliente = Cliente(0, "sp")
+    # Assert: Verifica se o valor final é exatamente 100 (sem alteração)
+    assert service.processar_pedido(cliente, 100) == 100.0
 
-# Perfil Bronze
+
 def test_rn01_bronze(service):
-    cliente = Cliente( 1, "sp")
-    assert  service.processar_pedido(cliente, 100)
+    # STUB: Cliente Bronze (3% desconto)
+    cliente = Cliente(1, "sp")
+    # Assert: 100 - 3 = 97
+    assert service.processar_pedido(cliente, 100) == 97.0
 
-#Perfil Prata
+
 def test_rn01_prata(service):
-    cliente = Cliente( 2, "sp")
-    assert  service.processar_pedido(cliente, 100)
+    # STUB: Cliente Prata (5% desconto)
+    cliente = Cliente(2, "sp")
+    # Assert: 100 - 5 = 95
+    assert service.processar_pedido(cliente, 100) == 95.0
 
-#Perfil Ouro
+
 def test_rn01_ouro(service):
-    cliente = Cliente( 3, "sp")
-    assert  service.processar_pedido(cliente, 100)
+    # STUB: Cliente Ouro (10% desconto)
+    cliente = Cliente(3, "sp")
+    # Assert: 100 - 10 = 90
+    assert service.processar_pedido(cliente, 100) == 90.0
 
-# Perfil inválido
+
 def test_rn01_invalido(service):
-    cliente = Cliente( 4, "sp")
-    assert  service.processar_pedido(cliente, 100)
+    # STUB: Cliente com perfil inexistente
+    cliente = Cliente(4, "sp")
+
+    # Tratamento de Exceção: É esperado um erro aqui
+    with pytest.raises(ValueError):
+        service.processar_pedido(cliente, 100)
 
 
+# --- TESTES RN02 ---
 
-# --- Testes RN02 ---
-
-# Estado de SP
 def test_rn02_sp(service):
-    cliente = Cliente( 0, "sp")
-    assert  service.processar_pedido(cliente, 100)
+    # STUB: Estado SP (Isento de frete)
+    cliente = Cliente(0, "sp")
+    assert service.processar_pedido(cliente, 100) == 100.0
 
-# Estado do Sudeste
+
 def test_rn02_sudeste(service):
-    cliente = Cliente( 0, "es")
-    assert  service.processar_pedido(cliente, 100)
+    # STUB: Estado ES (Sudeste = 5% frete)
+    cliente = Cliente(0, "es")
+    # Assert: 100 + 5 (frete) = 105
+    assert service.processar_pedido(cliente, 100) == 105.0
 
-# Estado do Brasil
+
 def test_rn02_brasil(service):
-    cliente = Cliente( 0, "am")
-    assert  service.processar_pedido(cliente, 100)
+    # STUB: Estado AM (Outros = 8% frete)
+    cliente = Cliente(0, "am")
+    # Assert: 100 + 8 (frete) = 108
+    assert service.processar_pedido(cliente, 100) == 108.0
 
-# Estado Inválido
+
 def test_rn02_invalido(service):
-    cliente = Cliente( 0, "texas")
-    assert  service.processar_pedido(cliente, 100)
+    # STUB: Estado fora do Brasil
+    cliente = Cliente(0, "texas")
 
+    # Tratamento de Exceção: O sistema deve impedir o cálculo
+    with pytest.raises(ValueError):
+        service.processar_pedido(cliente, 100)
