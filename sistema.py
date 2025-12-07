@@ -3,14 +3,12 @@
 class Cliente:
     def __init__(self, perfil_id, estado_uf):
         self.perfil_id = perfil_id
-        # Garante que o estado fique minusculo e sem espaços
         self.estado_uf = estado_uf.lower().strip()
 
 
 class CalculadoraPedidoService:
     ESTADOS_SUDESTE = ["sp", "mg", "es", "rj"]
 
-    # Lista completa para validação
     ESTADOS_BRASIL = [
         "ac", "al", "ap", "am", "ba", "ce", "df", "es", "go",
         "ma", "mt", "ms", "mg", "pa", "pb", "pr", "pe", "pi",
@@ -18,7 +16,9 @@ class CalculadoraPedidoService:
     ]
 
     def calcular_desconto(self, cliente: Cliente) -> float:
+
         # RN01
+
         if cliente.perfil_id == 0:  # Basico
             return 0.0
         elif cliente.perfil_id == 1:  # Bronze
@@ -27,19 +27,20 @@ class CalculadoraPedidoService:
             return 0.05
         elif cliente.perfil_id == 3:  # Ouro
             return 0.1
-        else:
+        else:                         # Invalido
             raise ValueError(f"Erro: Perfil '{cliente.perfil_id}' inválido. O programa será encerrado.")
 
     def calcular_frete(self, cliente: Cliente) -> float:
 
         # RN02
-        if cliente.estado_uf == "sp":
+
+        if cliente.estado_uf == "sp":                   # SP sem frete
             return 0.0
-        elif cliente.estado_uf in self.ESTADOS_SUDESTE:
+        elif cliente.estado_uf in self.ESTADOS_SUDESTE: # Sudeste 5%
             return 0.05
-        elif cliente.estado_uf in self.ESTADOS_BRASIL:
+        elif cliente.estado_uf in self.ESTADOS_BRASIL:  # Demais Regiões 8%
             return 0.08
-        else:
+        else:                                           # Inválido
             raise ValueError(f"Erro: Região '{cliente.estado_uf}' desconhecida ou fora do Brasil.")
 
 
